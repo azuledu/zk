@@ -2,7 +2,7 @@
 
 Utilidades y notas relacionadas con Zettelkasten digital.
 
-En doc/ZK-hashtags.pdf se describen las motivaciones de las que surge el script zk.
+En docs/ZK-hashtags.pdf se describen las motivaciones de las que surge el script `zk.sh`
 
 
 ### Script zk
