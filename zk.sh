@@ -18,10 +18,11 @@ Sintaxis: $(basename "${BASH_SOURCE[0]}") comando ['#tag']
 
 Comandos:
 
-tags          # Mostrar las notas asociadas a cada etiqueta
-tagscloud     # Número de veces que aparece cada una de las etiquetas (nube de etiquetas)
-tag '#tag1'   # Buscar las notas en las que aparezca la etiqueta #tag1
-notes '#tag1' # Mostrar el contenido de las notas que contengan la etiqueta #tag1
+tagtable      # Tabla de frecuencias de etiquetas.
+tagcloud      # Nube de etiquetas.
+tagnotes      # Notas asociadas a cada etiqueta.
+tag '#tag1'   # Notas en las que aparezca la etiqueta #tag1
+notes '#tag1' # Contenido de las notas que contengan la etiqueta #tag1
 
 EOF
   exit
@@ -46,15 +47,31 @@ die() {
   exit "$code"
 }
 
-# Mostrar las notas asociadas a cada etiqueta en forma de tabla.
-# Problema: etiquetas que contengan :
+# Tabla con el número de apariciones de cada etiqueta (tabla de frecuencias).
+function tagtable() {
+  grep $COMMON_GREP_OPTS -oh '#[[:alnum:]]\+[[:space:]]' $ZK_PATH \
+  | sort | uniq -c | sort -rn
+}
+
+# Lista de etiquetas para generar una nube de etiquetas con apps externas.
 function taglist() {
-  grep $COMMON_GREP_OPTS -o --exclude-dir=$EXCLUDE_DIR '#[^# ][[:alnum:]]*[[:space:]]' * \
+  grep $COMMON_GREP_OPTS -soh --exclude-dir=$EXCLUDE_DIR '#[[:alnum:]]\+[[:space:]]' * | sort
+}
+
+# Nube de etiquetas.
+function tagcloud() {
+  zk taglist | wordcloud_cli --imagefile /tmp/tagcloud.png
+  eog /tmp/tagcloud.png
+}
+
+# Notas asociadas a cada etiqueta en forma de tabla. (Problema: etiquetas que contengan :)
+function simple_tagnotes() {
+  grep $COMMON_GREP_OPTS -so --exclude-dir=$EXCLUDE_DIR '#[[:alnum:]]\+[[:space:]]' * \
   | column -t -s':' -O 2,1 | sort | uniq
 }
 
-# Mostrar las notas asociadas a cada etiqueta en forma de clave:valor(es)
-function tags() {
+# Notas asociadas a cada etiqueta mostradas como clave:valor(es)
+function tagnotes() {
   previous_tag=""
   local -A tagdictionary
   while read tag file
@@ -69,9 +86,10 @@ function tags() {
     fi
     previous_tag=$tag
     # https://stackoverflow.com/questions/4667509/shell-variables-set-inside-while-loop-not-visible-outside-of-it
-  done < <(taglist)
+  done < <(simple_tagnotes)
 
-  IFS=$'\n' sortedKeys=($(sort <<<"${!tagdictionary[@]}")) ; unset IFS
+  # Ordenar las etiquetas alfabéticamente
+  IFS=$'\n' sortedKeys=( $(sort <<<"${!tagdictionary[@]}") ) ; unset IFS
 
   for key in "${sortedKeys[@]}"
   do
@@ -79,18 +97,12 @@ function tags() {
   done
 }
 
-# Cantidad de cada una de las etiquetas (nube de etiquetas)
-function tagscloud() {
-  grep $COMMON_GREP_OPTS -oh '#[^# ][[:alnum:]]*[[:space:]]' $ZK_PATH \
-  | sort | uniq -c | sort -rn
-}
-
-# Buscar las notas en las que aparezca la etiqueta pasada como parámetro
+# Notas en las que aparezca la etiqueta pasada como parámetro
 function tag() {
   grep $COMMON_GREP_OPTS -ws --exclude-dir $EXCLUDE_DIR "$1" * ;
 }
 
-# Mostrar el contenido de las notas que contengan la etiqueta pasada como parámetro
+# Contenido de las notas que contengan la etiqueta pasada como parámetro
 function notes() {
     $NOTES_VIEWER $(grep $COMMON_GREP_OPTS -wsl --exclude-dir $EXCLUDE_DIR "$1" $ZK_PATH);
 }
@@ -115,9 +127,11 @@ function parse_params() {
     case "${1-}" in
     -h | --help) usage ;;
     -?*) die "Opción desconocida: $1" ;;
-    tags) tags ; break ;;
-    tagscloud) tagscloud ; break ;;
+    tagtable) tagtable ; break ;;
     taglist) taglist ; break ;;
+    tagcloud) tagcloud ; break ;;
+    simple_tagnotes) simple_tagnotes ; break ;;
+    tagnotes) tagnotes ; break ;;
     tag)
       checkNumParam $# 2 "Es necesario especificar una etiqueta: zk tag ${RED}'#tag1'" ;
       tag $2 ;

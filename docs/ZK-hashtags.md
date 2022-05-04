@@ -131,31 +131,37 @@ Para los comandos que impliquen mostrar el contenido de las notas, una herramien
 # Buscar las notas en las que aparezca la etiqueta #tag1:
 grep -wr '#tag1'
 
-# Mostrar el contenido de todas las notas que contengan la
-# etiqueta #tag1:
+# Mostrar el contenido de todas las notas que contengan la etiqueta #tag1:
 grep -wrl '#tag1' | xargs cat
 
 # Buscar todas las etiquetas que aparezcan en los archivos del
 # directorio actual y sus subdirectorios:
-grep -r '#[^# ][[:alnum:]]*[[:space:]]'
-# '#[^# ]...' significa palabras cuyo primer carácter sea #
-# y que el segundo sea diferente de # o espacio
+grep -r '#[[:alnum:]]\+[[:space:]]'
 
-# Número de veces que aparece cada una de las etiquetas (nube de etiquetas)
-grep -orh '#[^# ][[:alnum:]]*[[:space:]]' * | sort | uniq -c | sort -rn
+# Tabla con el número de apariciones de cada etiqueta (tabla de frecuencias).
+grep -sorh '#[[:alnum:]]\+[[:space:]]' | sort | uniq -c | sort -rn
 
 # Mostrar las notas asociadas a cada etiqueta
-grep -or '#[^# ][[:alnum:]]*[[:space:]]' * | column -t -s':' -O 2,1 | sort | uniq
+grep -sor '#[[:alnum:]]\+[[:space:]]' | column -t -s':' -O 2,1 | sort | uniq
 ```
   \
 
-Con estos comando se puede crear un sencillo **lenguaje especifico de dominio** (DSL) con los siguientes comandos:
+La salida de alguno de estos comandos puede servir como entrada para otras aplicaciones. Por ejemplo, si tenemos instalado WordCloud[^15] (`sudo apt install python3-wordcloud`) podemos generar una imagen que muestre una nube de etiquetas:
+
+```bash
+grep -sorh '#[[:alnum:]]\+[[:space:]]' \
+| wordcloud_cli --imagefile tagcloud.png && eog tagcloud.png
+```
+\
+
+Con estos comandos se puede crear un sencillo **lenguaje especifico de dominio (DSL)** con los siguientes comandos:
 
 ```
-tags          # Mostrar las notas asociadas a cada etiqueta
-tagscloud     # Número de veces que aparece cada una de las etiquetas (nube de etiquetas)
-tag '#tag1'   # Buscar las notas en las que aparezca la etiqueta #tag1
-notes '#tag1' # Mostrar el contenido de las notas que contengan la etiqueta #tag1
+tagtable      # Tabla de frecuencias de etiquetas.
+tagcloud      # Nube de etiquetas.
+tagnotes      # Notas asociadas a cada etiqueta.
+tag '#tag1'   # Notas en las que aparezca la etiqueta #tag1
+notes '#tag1' # Contenido de las notas que contengan la etiqueta #tag1
 ```
 
 Para que el intérprete de comandos no considere el texto después de # como un comentario es necesario entrecomillar el nombre de la etiqueta. P.ej: `'#tag1'`
@@ -166,13 +172,18 @@ Lo codificamos añadiendo estas líneas al archivo `~/.bashrc`:
 ``` bash
 # Zettelkasten DSL:
 
-alias tags="grep -or '#[^# ][[:alnum:]]*[[:space:]]' | column -t -s':' -O 2,1 | sort | uniq"
+tagtable() { grep -sorh '#[[:alnum:]]\+[[:space:]]' \
+| sort | uniq -c | sort -rn ; }
 
-alias tagscloud="grep -orh '#[^# ][[:alnum:]]*[[:space:]]' | sort | uniq -c | sort -rn"
+tagcloud() { grep -sorh '#[[:alnum:]]\+[[:space:]]' \
+| wordcloud_cli --imagefile /tmp/tagcloud.png && eog /tmp/tagcloud.png ; }
 
-tag() { grep -wr "$1"; }
+tagnotes() { grep -sor '#[[:alnum:]]\+[[:space:]]' \
+| column -t -s':' -O 2,1 | sort | uniq ; }
 
-notes() { grep -wrl "$1" | xargs cat; }
+tag() { grep -wr "$1" ; }
+
+notes() { grep -wrl "$1" | xargs cat ; }
 ```
   \
 
@@ -180,3 +191,4 @@ Una solución completa consistiría en agrupar estos y otros comandos y opciones
 
 
 [^14]: https://github.com/sharkdp/bat
+[^15]: https://github.com/amueller/word_cloud
