@@ -6,6 +6,7 @@ set -Eeuo pipefail
 script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd -P)
 source $script_dir/zk.cfg
 
+# Punto de entrada al script.
 main() {
   setup_colors
   [[ $# -eq 0 ]] && usage
@@ -91,6 +92,7 @@ function tagnotes() {
   # Ordenar las etiquetas alfabéticamente
   IFS=$'\n' sortedKeys=( $(sort <<<"${!tagdictionary[@]}") ) ; unset IFS
 
+  # Mostrar diccionario tag->notas
   for key in "${sortedKeys[@]}"
   do
     msg "${RED}$key${NOFORMAT} ${tagdictionary[$key]}"
@@ -107,6 +109,7 @@ function notes() {
     $NOTES_VIEWER $(grep $COMMON_GREP_OPTS -wsl --exclude-dir $EXCLUDE_DIR "$1" $ZK_PATH);
 }
 
+# Verifica el número de parámetros de entrada.
 # $1: Num de parámetros
 # $2: Num máximo de parámetros
 # $3: Mensaje de error
@@ -115,21 +118,34 @@ function checkNumParam() {
   numMaxParams=$2
   errorMessage=$3
   if [ $numParams -lt $numMaxParams ]; then
-    msg "$errorMessage"
-    exit 1
+    die "$errorMessage"
+  fi
+}
+
+# Comprueba si un comando está instalado en el sistema.
+# $1: Comando a comprobar
+function checkInstalledCommand() {
+  command=$1
+  if ! command -v $command &> /dev/null
+  then
+      die "$command could not be found"
   fi
 }
 
 function parse_params() {
+  # Trabajar en el directorio en el que se encuentran las notas para evitar
+  # que 'grep' muestre la ruta de los archivos (notas) en los resultados.
   dir=`pwd -P`
   cd $ZK_PATH
+
+  # Ejecutar comando correspondiente
   while :; do
     case "${1-}" in
     -h | --help) usage ;;
     -?*) die "Opción desconocida: $1" ;;
     tagtable) tagtable ; break ;;
-    taglist) taglist ; break ;;
-    tagcloud) tagcloud ; break ;;
+    taglist)  taglist ; break ;;
+    tagcloud) checkInstalledCommand 'wordcloud_cli' && tagcloud ; break ;;
     simple_tagnotes) simple_tagnotes ; break ;;
     tagnotes) tagnotes ; break ;;
     tag)
@@ -144,10 +160,11 @@ function parse_params() {
     esac
     shift
   done
+
   cd $dir
 
   return 0
 }
 
-
+# Ejecutar programa principal
 main "$@"
