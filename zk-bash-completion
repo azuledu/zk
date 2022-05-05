@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+#set -x
+
+complete -W 'tagtable taglist tagcloud tagnotes tag notes' zk

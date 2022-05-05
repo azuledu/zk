@@ -18,9 +18,16 @@ sudo cp ~/git/zk/zk.cfg /usr/local/bin/zk.cfg
 
 Configurar las opciones deseadas en el archivo `/usr/local/bin/zk.cfg`
 
+Para tener **autocompletado** en el script:
+
+``` bash
+sudo ln -s ~/git/zk/zk-bash-completion /etc/bash_completion.d/zk
+```
+
+
 ##### Bat
 
-Bat permite resaltado de sintaxis en el terminal.
+Bat permite **resaltado de sintaxis** en el terminal.
 
 Instalar Bat desde https://github.com/sharkdp/bat
 
@@ -31,7 +38,7 @@ Modificar la variable `NOTES_VIEWER` en el archivo `/usr/local/bin/zk.cfg`
 
 [_WordCloud_](https://github.com/amueller/word_cloud) permite generar de nubes de palabras a partir de textos.
 
-Para generar una nube de etiquetas directamente mediante `zk tagcloud` debemos instalarlo:
+Para generar una **nube de etiquetas** directamente mediante `zk tagcloud` debemos instalarlo:
 
 ``` bash
 sudo apt install python3-wordcloud
