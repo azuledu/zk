@@ -66,3 +66,17 @@ Es posible generar una tabla con el número de apariciones de cada etiqueta medi
 El comando `zk taglist` genera una lista con todas las etiquetas. Esta lista puede usarse como entrada para aplicaciones de generación de nubes de palabras a partir de textos. Una aplicación usada habitualmente es [_WordCloud_](https://github.com/amueller/word_cloud)
 
 Si lo tenemos instalado es posible generar una nube de etiquetas directamente mediante `zk tagcloud`
+
+
+### Integraciones
+
+##### Bat
+
+Colorea las etiquetas como si fueran enlaces.
+
+``` bash
+mkdir -p "$(bat --config-dir)/syntaxes"
+cd "$(bat --config-dir)/syntaxes"
+ln -s ~/git/zk/integraciones/bat/Markdown.sublime-syntax "$(bat --config-dir)/syntaxes/Markdown.sublime-syntax"
+bat cache --build
+```

@@ -48,7 +48,7 @@ die() {
   exit "$code"
 }
 
-# Tabla con el número de apariciones de cada etiqueta (tabla de frecuencias).
+# Tabla con el número de apariciones de cada etiqueta (tabla de frecuencias). (MapReduce)
 function tagtable() {
   grep $COMMON_GREP_OPTS -oh '#[[:alnum:]]\+[[:space:]]' $ZK_PATH \
   | sort | uniq -c | sort -rn
@@ -66,12 +66,14 @@ function tagcloud() {
 }
 
 # Notas asociadas a cada etiqueta en forma de tabla. (Problema: etiquetas que contengan :)
-function simple_tagnotes() {
+# Fase "Map" en un proceso MapReduce
+function map_tagnotes() {
   grep $COMMON_GREP_OPTS -so --exclude-dir=$EXCLUDE_DIR '#[[:alnum:]]\+[[:space:]]' * \
-  | column -t -s':' -O 2,1 | sort | uniq
+  | column -t -s':' -O 2,1 | sort
 }
 
-# Notas asociadas a cada etiqueta mostradas como clave:valor(es)
+# Notas asociadas a cada etiqueta mostradas como clave:valor(es) (MapReduce)
+# Fase "Reduce" en un proceso MapReduce
 function tagnotes() {
   previous_tag=""
   local -A tagdictionary
@@ -87,7 +89,7 @@ function tagnotes() {
     fi
     previous_tag=$tag
     # https://stackoverflow.com/questions/4667509/shell-variables-set-inside-while-loop-not-visible-outside-of-it
-  done < <(simple_tagnotes)
+  done < <(map_tagnotes)
 
   # Ordenar las etiquetas alfabéticamente
   IFS=$'\n' sortedKeys=( $(sort <<<"${!tagdictionary[@]}") ) ; unset IFS
@@ -146,7 +148,7 @@ function parse_params() {
     tagtable) tagtable ; break ;;
     taglist)  taglist ; break ;;
     tagcloud) checkInstalledCommand 'wordcloud_cli' && tagcloud ; break ;;
-    simple_tagnotes) simple_tagnotes ; break ;;
+    map_tagnotes) map_tagnotes ; break ;;
     tagnotes) tagnotes ; break ;;
     tag)
       checkNumParam $# 2 "Es necesario especificar una etiqueta: zk tag ${RED}'#tag1'" ;
