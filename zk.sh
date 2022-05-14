@@ -6,15 +6,18 @@ set -Eeuo pipefail
 script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd -P)
 source $script_dir/zk.cfg
 
+# Colores
+NOFORMAT='\033[0m'
+RED='\033[0;31m'
+
 # Punto de entrada al script.
 main() {
-  setup_colors
   [[ $# -eq 0 ]] && usage
   parse_params "$@"
 }
 
 usage() {
-  cat << EOF # remove the space between << and EOF, this is due to web plugin issue
+  cat << EOF
 Sintaxis: $(basename "${BASH_SOURCE[0]}") comando ['#tag']
 
 Comandos:
@@ -29,34 +32,25 @@ EOF
   exit
 }
 
-setup_colors() {
-  if [[ -t 2 ]] && [[ -z "${NO_COLOR-}" ]] && [[ "${TERM-}" != "dumb" ]]; then
-    NOFORMAT='\033[0m' RED='\033[0;31m' GREEN='\033[0;32m' ORANGE='\033[0;33m' BLUE='\033[0;34m' PURPLE='\033[0;35m' CYAN='\033[0;36m' YELLOW='\033[1;33m'
-  else
-    NOFORMAT='' RED='' GREEN='' ORANGE='' BLUE='' PURPLE='' CYAN='' YELLOW=''
-  fi
+function get_tags() {
+  grep $COMMON_GREP_OPTS -soh --exclude-dir=$EXCLUDE_DIR '#[[:alnum:]]\+[[:space:]]' $ZK_PATH
 }
 
-msg() {
-  echo >&2 -e "${1-}"
-}
-
-die() {
-  local msg=$1
-  local code=${2-1} # default exit status 1
-  msg "$msg"
-  exit "$code"
+function get_tags_and_files() {
+  # Trabajar en el directorio en el que se encuentran las notas para evitar
+  # que 'grep' muestre la ruta de los archivos (notas) en los resultados.
+  cd $ZK_PATH
+  grep $COMMON_GREP_OPTS -so --exclude-dir=$EXCLUDE_DIR '#[[:alnum:]]\+[[:space:]]' *
 }
 
 # Tabla con el número de apariciones de cada etiqueta (tabla de frecuencias). (MapReduce)
 function tagtable() {
-  grep $COMMON_GREP_OPTS -oh '#[[:alnum:]]\+[[:space:]]' $ZK_PATH \
-  | sort | uniq -c | sort -rn
+  get_tags | sort | uniq -c | sort -rn
 }
 
 # Lista de etiquetas para generar una nube de etiquetas con apps externas.
 function taglist() {
-  grep $COMMON_GREP_OPTS -soh --exclude-dir=$EXCLUDE_DIR '#[[:alnum:]]\+[[:space:]]' * | sort
+  get_tags | sort
 }
 
 # Nube de etiquetas.
@@ -68,8 +62,7 @@ function tagcloud() {
 # Notas asociadas a cada etiqueta en forma de tabla. (Problema: etiquetas que contengan :)
 # Fase "Map" en un proceso MapReduce
 function map_tagnotes() {
-  grep $COMMON_GREP_OPTS -so --exclude-dir=$EXCLUDE_DIR '#[[:alnum:]]\+[[:space:]]' * \
-  | column -t -s':' -O 2,1 | sort
+  get_tags_and_files | column -t -s':' -O 2,1 | sort
 }
 
 # Notas asociadas a cada etiqueta mostradas como clave:valor(es) (MapReduce)
@@ -97,18 +90,24 @@ function tagnotes() {
   # Mostrar diccionario tag->notas
   for key in "${sortedKeys[@]}"
   do
-    msg "${RED}$key${NOFORMAT} ${tagdictionary[$key]}"
+    echo -e "${RED}$key${NOFORMAT} ${tagdictionary[$key]}"
   done
 }
 
 # Notas en las que aparezca la etiqueta pasada como parámetro
 function tag() {
+  # Trabajar en el directorio en el que se encuentran las notas para evitar
+  # que 'grep' muestre la ruta de los archivos (notas) en los resultados.
+  cd $ZK_PATH
   grep $COMMON_GREP_OPTS -ws --exclude-dir $EXCLUDE_DIR "$1" * ;
 }
 
 # Contenido de las notas que contengan la etiqueta pasada como parámetro
 function notes() {
-    $NOTES_VIEWER $(grep $COMMON_GREP_OPTS -wsl --exclude-dir $EXCLUDE_DIR "$1" $ZK_PATH);
+  # Trabajar en el directorio en el que se encuentran las notas para evitar
+  # que 'grep' muestre la ruta de los archivos (notas) en los resultados.
+  cd $ZK_PATH
+  $NOTES_VIEWER $(grep $COMMON_GREP_OPTS -wsl --exclude-dir $EXCLUDE_DIR "$1" *);
 }
 
 # Verifica el número de parámetros de entrada.
@@ -120,7 +119,7 @@ function checkNumParam() {
   numMaxParams=$2
   errorMessage=$3
   if [ $numParams -lt $numMaxParams ]; then
-    die "$errorMessage"
+    echo -e "$errorMessage"
   fi
 }
 
@@ -130,21 +129,16 @@ function checkInstalledCommand() {
   command=$1
   if ! command -v $command &> /dev/null
   then
-      die "$command could not be found"
+      echo -e "$command no encontrado"
   fi
 }
 
+# Ejecutar comando correspondiente
 function parse_params() {
-  # Trabajar en el directorio en el que se encuentran las notas para evitar
-  # que 'grep' muestre la ruta de los archivos (notas) en los resultados.
-  dir=`pwd -P`
-  cd $ZK_PATH
-
-  # Ejecutar comando correspondiente
   while :; do
     case "${1-}" in
     -h | --help) usage ;;
-    -?*) die "Opción desconocida: $1" ;;
+    -?*) echo -e "Opción desconocida: $1" ;;
     tagtable) tagtable ; break ;;
     taglist)  taglist ; break ;;
     tagcloud) checkInstalledCommand 'wordcloud_cli' && tagcloud ; break ;;
@@ -158,12 +152,10 @@ function parse_params() {
       checkNumParam $# 2 "Es necesario especificar una etiqueta: zk notes ${RED}'#tag1'" ;
       notes $2 ;
       break ;;
-    *) die "Comando desconocido: $1" ;;
+    *) echo -e "Comando desconocido: $1" ;;
     esac
     shift
   done
-
-  cd $dir
 
   return 0
 }

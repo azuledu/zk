@@ -72,7 +72,7 @@ Si lo tenemos instalado es posible generar una nube de etiquetas directamente me
 
 ##### Bat
 
-Colorea las etiquetas como si fueran enlaces.
+Añade resaltado de sintaxis para hashtags como si fueran enlaces. Facilita la visualización del contenido de las notas mediante `zk notes '#tag1'`
 
 ``` bash
 mkdir -p "$(bat --config-dir)/syntaxes"
