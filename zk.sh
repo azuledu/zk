@@ -45,6 +45,7 @@ function get_tags_and_files() {
 
 # Tabla con el número de apariciones de cada etiqueta (tabla de frecuencias). (MapReduce)
 function tagtable() {
+  #  map   | sort | reduce  | sort
   get_tags | sort | uniq -c | sort -rn
 }
 
