@@ -136,20 +136,20 @@ grep -wrl '#tag1' | xargs cat
 
 # Buscar todas las etiquetas que aparezcan en los archivos del
 # directorio actual y sus subdirectorios:
-grep -r '#[[:alnum:]]\+[[:space:]]'
+grep -r '#[[:alnum:]]\+\b'
 
 # Tabla con el número de apariciones de cada etiqueta (tabla de frecuencias).
-grep -sorh '#[[:alnum:]]\+[[:space:]]' | sort | uniq -c | sort -rn
+grep -sorh '#[[:alnum:]]\+\b' | sort | uniq -c | sort -rn
 
 # Mostrar las notas asociadas a cada etiqueta
-grep -sor '#[[:alnum:]]\+[[:space:]]' | column -t -s':' -O 2,1 | sort | uniq
+grep -sor '#[[:alnum:]]\+\b' | column -t -s':' -O 2,1 | sort | uniq
 ```
   \
 
 La salida de alguno de estos comandos puede servir como entrada para otras aplicaciones. Por ejemplo, si tenemos instalado WordCloud[^15] (`sudo apt install python3-wordcloud`) podemos generar una imagen que muestre una nube de etiquetas:
 
 ```bash
-grep -sorh '#[[:alnum:]]\+[[:space:]]' \
+grep -sorh '#[[:alnum:]]\+\b' \
 | wordcloud_cli --imagefile tagcloud.png && eog tagcloud.png
 ```
 \
@@ -172,13 +172,13 @@ Lo codificamos añadiendo estas líneas al archivo `~/.bashrc`:
 ``` bash
 # Zettelkasten DSL:
 
-tagtable() { grep -sorh '#[[:alnum:]]\+[[:space:]]' \
+tagtable() { grep -sorh '#[[:alnum:]]\+\b' \
 | sort | uniq -c | sort -rn ; }
 
-tagcloud() { grep -sorh '#[[:alnum:]]\+[[:space:]]' \
+tagcloud() { grep -sorh '#[[:alnum:]]\+\b' \
 | wordcloud_cli --imagefile /tmp/tagcloud.png && eog /tmp/tagcloud.png ; }
 
-tagnotes() { grep -sor '#[[:alnum:]]\+[[:space:]]' \
+tagnotes() { grep -sor '#[[:alnum:]]\+\b' \
 | column -t -s':' -O 2,1 | sort | uniq ; }
 
 tag() { grep -wr "$1" ; }
@@ -187,7 +187,7 @@ notes() { grep -wrl "$1" | xargs cat ; }
 ```
   \
 
-Una solución completa consistiría en agrupar estos y otros comandos y opciones en un script específico.
+Una solución completa consistiría en agrupar estos y otros comandos y opciones en un script específico. En https://github.com/azuledu/zk pueden encontrarse algunos scripts de ejemplo.
 
 
 [^14]: https://github.com/sharkdp/bat

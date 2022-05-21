@@ -34,14 +34,14 @@ EOF
 }
 
 function get_tags() {
-  grep $COMMON_GREP_OPTS -soh --exclude-dir=$EXCLUDE_DIR '#[[:alnum:]]\+[[:space:]]' $ZK_PATH
+  grep $COMMON_GREP_OPTS -soh --exclude-dir=$EXCLUDE_DIR '#[[:alnum:]]\+\b' $ZK_PATH
 }
 
 function get_tags_and_files() {
   # Trabajar en el directorio en el que se encuentran las notas para evitar
   # que 'grep' muestre la ruta de los archivos (notas) en los resultados.
   cd $ZK_PATH || exit
-  grep $COMMON_GREP_OPTS -so --exclude-dir=$EXCLUDE_DIR '#[[:alnum:]]\+[[:space:]]' *
+  grep $COMMON_GREP_OPTS -so --exclude-dir=$EXCLUDE_DIR '#[[:alnum:]]\+\b' *
 }
 
 # Tabla con el número de apariciones de cada etiqueta (tabla de frecuencias). (MapReduce)
@@ -64,7 +64,7 @@ function tagcloud() {
 # Notas asociadas a cada etiqueta en forma de tabla. (Problema: etiquetas que contengan :)
 # Fase "Map" en un proceso MapReduce
 function map_tagnotes() {
-  get_tags_and_files | column -t -s':' -O 2,1 | sort
+  get_tags_and_files | column -t -s':' -O 2,1 | sort | uniq
 }
 
 # Notas asociadas a cada etiqueta mostradas como clave:valor(es) (MapReduce)
