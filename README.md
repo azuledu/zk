@@ -7,7 +7,7 @@ En docs/ZK-hashtags.pdf se describen las motivaciones de las que surge el script
 
 ### Instalación
 
-##### Script zk
+#### Script zk
 
 ``` bash
 mkdir ~/git/zk
@@ -25,7 +25,7 @@ sudo ln -s ~/git/zk/zk-bash-completion /etc/bash_completion.d/zk
 ```
 
 
-##### Bat
+#### Bat
 
 Bat permite **resaltado de sintaxis** en el terminal.
 
@@ -34,7 +34,7 @@ Instalar Bat desde https://github.com/sharkdp/bat
 Modificar la variable `NOTES_VIEWER` en el archivo `/usr/local/bin/zk.cfg`
 
 
-##### WordCloud
+#### WordCloud
 
 [_WordCloud_](https://github.com/amueller/word_cloud) permite generar de nubes de palabras a partir de textos.
 
@@ -70,7 +70,7 @@ Si lo tenemos instalado es posible generar una nube de etiquetas directamente me
 
 ### Integraciones
 
-##### Bat
+#### Bat
 
 Añade resaltado de sintaxis para hashtags como si fueran enlaces. Facilita la visualización del contenido de las notas mediante `zk notes '#tag1'`
 
@@ -79,4 +79,18 @@ mkdir -p "$(bat --config-dir)/syntaxes"
 cd "$(bat --config-dir)/syntaxes"
 ln -s ~/git/zk/integraciones/bat/Markdown.sublime-syntax "$(bat --config-dir)/syntaxes/Markdown.sublime-syntax"
 bat cache --build
+```
+
+
+#### Sublime Text
+
+Utiliza el mismo sistema que Bat para definir el resaltado de sintaxis por lo que puede usarse el mismo fichero.
+
+
+#### Atom
+
+
+```bash
+ln -s ~/git/zk/integraciones/atom/language-markdown-hashtags ~/.atom/packages/language-markdown-hashtags
+
 ```

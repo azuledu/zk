@@ -1,14 +1,15 @@
 #!/usr/bin/env bash
-#set -x
-set -Eeuo pipefail
+
+set -Euo pipefail
 
 # Configuración
 script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd -P)
-source $script_dir/zk.cfg
+source $script_dir/zk.cfg || exit
 
 # Colores
 NOFORMAT='\033[0m'
-RED='\033[0;31m'
+RED='\033[1;31m'
+GREEN='\033[1;32m'
 
 # Punto de entrada al script.
 main() {
@@ -39,7 +40,7 @@ function get_tags() {
 function get_tags_and_files() {
   # Trabajar en el directorio en el que se encuentran las notas para evitar
   # que 'grep' muestre la ruta de los archivos (notas) en los resultados.
-  cd $ZK_PATH
+  cd $ZK_PATH || exit
   grep $COMMON_GREP_OPTS -so --exclude-dir=$EXCLUDE_DIR '#[[:alnum:]]\+[[:space:]]' *
 }
 
@@ -91,7 +92,7 @@ function tagnotes() {
   # Mostrar diccionario tag->notas
   for key in "${sortedKeys[@]}"
   do
-    echo -e "${RED}$key${NOFORMAT} ${tagdictionary[$key]}"
+    echo -e "${GREEN}$key${NOFORMAT} ${tagdictionary[$key]}"
   done
 }
 
@@ -99,7 +100,7 @@ function tagnotes() {
 function tag() {
   # Trabajar en el directorio en el que se encuentran las notas para evitar
   # que 'grep' muestre la ruta de los archivos (notas) en los resultados.
-  cd $ZK_PATH
+  cd $ZK_PATH || exit
   grep $COMMON_GREP_OPTS -ws --exclude-dir $EXCLUDE_DIR "$1" * ;
 }
 
@@ -107,8 +108,13 @@ function tag() {
 function notes() {
   # Trabajar en el directorio en el que se encuentran las notas para evitar
   # que 'grep' muestre la ruta de los archivos (notas) en los resultados.
-  cd $ZK_PATH
-  $NOTES_VIEWER $(grep $COMMON_GREP_OPTS -wsl --exclude-dir $EXCLUDE_DIR "$1" *);
+  cd $ZK_PATH || exit
+  notes="$(grep $COMMON_GREP_OPTS -wsl --exclude-dir $EXCLUDE_DIR "$1" *)"
+  if [[ -n $notes ]];  then
+    $NOTES_VIEWER $notes
+  else
+    echo -e "etiqueta ${RED}$1${NOFORMAT} no encontrada en las notas."
+  fi
 }
 
 # Verifica el número de parámetros de entrada.
@@ -121,6 +127,7 @@ function checkNumParam() {
   errorMessage=$3
   if [ $numParams -lt $numMaxParams ]; then
     echo -e "$errorMessage"
+    exit 1
   fi
 }
 
