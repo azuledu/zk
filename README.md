@@ -89,8 +89,11 @@ Utiliza el mismo sistema que Bat para definir el resaltado de sintaxis por lo qu
 
 #### Atom
 
+https://atom.io/packages/language-markdown-hashtags
+
+Syntax highlighting for hashtags in Markdown.
 
 ```bash
-ln -s ~/git/zk/integraciones/atom/language-markdown-hashtags ~/.atom/packages/language-markdown-hashtags
+apm install language-markdown-hashtags
 
 ```
