@@ -2,7 +2,8 @@
 
 Utilidades y notas relacionadas con Zettelkasten digital.
 
-En docs/ZK-hashtags.pdf se describen las motivaciones de las que surge el script `zk.sh`
+En `docs/ZK-hashtags.pdf` se describen las motivaciones de las que surgen los scripts.
+En `integraciones` se encuentran plugins para diferentes aplicaciones que extienden Markdown añadiendo resaltado de sintaxis para hashtags.
 
 
 ### Instalación
@@ -23,7 +24,6 @@ Para tener **autocompletado** en el script:
 ``` bash
 sudo ln -s ~/git/zk/zk-bash-completion /etc/bash_completion.d/zk
 ```
-
 
 #### Bat
 
