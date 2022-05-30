@@ -4,7 +4,10 @@ Utilidades y notas relacionadas con Zettelkasten digital.
 
 En `docs/ZK-hashtags.pdf` se describen las motivaciones de las que surgen los scripts.
 En `integraciones` se encuentran plugins para diferentes aplicaciones que extienden Markdown añadiendo resaltado de sintaxis para hashtags.
+<<<<<<< HEAD
 
+=======
+>>>>>>> d0f69ab (Readme)
 
 ### Instalación
 
