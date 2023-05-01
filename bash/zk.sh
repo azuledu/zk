@@ -4,7 +4,7 @@ set -Euo pipefail
 
 # Configuración
 script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd -P)
-source $script_dir/zk.cfg || exit
+source "$script_dir/zk.cfg" || exit
 
 # Colores
 NOFORMAT='\033[0m'
@@ -23,9 +23,9 @@ Sintaxis: $(basename "${BASH_SOURCE[0]}") comando ['#tag']
 
 Comandos:
 
-tagtable      # Tabla de frecuencias de etiquetas.
-tagcloud      # Nube de etiquetas.
 tagnotes      # Notas asociadas a cada etiqueta.
+tagcloud      # Nube de etiquetas.
+tagtable      # Tabla de frecuencias de etiquetas.
 tag '#tag1'   # Notas en las que aparezca la etiqueta #tag1
 notes '#tag1' # Contenido de las notas que contengan la etiqueta #tag1
 
@@ -34,14 +34,14 @@ EOF
 }
 
 function get_tags() {
-  grep $COMMON_GREP_OPTS -soh --exclude-dir=$EXCLUDE_DIR '#[[:alnum:]]\+\b' $ZK_PATH
+  grep $COMMON_GREP_OPTS -soh --exclude-dir="$EXCLUDE_DIR" '#[[:alnum:]]\+\b' "$ZK_PATH"
 }
 
 function get_tags_and_files() {
   # Trabajar en el directorio en el que se encuentran las notas para evitar
   # que 'grep' muestre la ruta de los archivos (notas) en los resultados.
-  cd $ZK_PATH || exit
-  grep $COMMON_GREP_OPTS -so --exclude-dir=$EXCLUDE_DIR '#[[:alnum:]]\+\b' *
+  cd "$ZK_PATH" || exit
+  grep $COMMON_GREP_OPTS -so --exclude-dir="$EXCLUDE_DIR" '#[[:alnum:]]\+\b' *
 }
 
 # Tabla con el número de apariciones de cada etiqueta (tabla de frecuencias). (MapReduce)
@@ -57,7 +57,8 @@ function taglist() {
 
 # Nube de etiquetas.
 function tagcloud() {
-  zk taglist | wordcloud_cli --imagefile /tmp/tagcloud.png
+  # https://amueller.github.io/word_cloud/cli.html
+  zk taglist | wordcloud_cli --imagefile /tmp/tagcloud.png --width 800 --heigh 800 --no_collocations
   eog /tmp/tagcloud.png
 }
 
@@ -72,27 +73,25 @@ function map_tagnotes() {
 function tagnotes() {
   previous_tag=""
   local -A tagdictionary
-  while read tag file
+  while read -r tag file
   do
     if [[ ($previous_tag != "$tag") ]]
     then
-      key=$tag
-      tagdictionary[$key]="${file:0:-3}"
+      tagdictionary[$tag]="${file:0:-3}"
     else
-      files="${tagdictionary["$tag"]},${file:0:-3}"
-      tagdictionary[$key]="$files"
+      tagdictionary[$tag]="${tagdictionary["$tag"]}  ${file:0:-3}"
     fi
     previous_tag=$tag
     # https://stackoverflow.com/questions/4667509/shell-variables-set-inside-while-loop-not-visible-outside-of-it
   done < <(map_tagnotes)
 
   # Ordenar las etiquetas alfabéticamente
-  IFS=$'\n' sortedKeys=( $(sort <<<"${!tagdictionary[@]}") ) ; unset IFS
+  IFS=$'\n' sortedTags=( $(sort <<<"${!tagdictionary[@]}") ) ; unset IFS
 
   # Mostrar diccionario tag->notas
-  for key in "${sortedKeys[@]}"
+  for tag in "${sortedTags[@]}"
   do
-    echo -e "${GREEN}$key${NOFORMAT} ${tagdictionary[$key]}"
+    echo -e "${GREEN}$tag${NOFORMAT}:${tagdictionary[$tag]}"
   done
 }
 
@@ -100,16 +99,16 @@ function tagnotes() {
 function tag() {
   # Trabajar en el directorio en el que se encuentran las notas para evitar
   # que 'grep' muestre la ruta de los archivos (notas) en los resultados.
-  cd $ZK_PATH || exit
-  grep $COMMON_GREP_OPTS -ws --exclude-dir $EXCLUDE_DIR "$1" * ;
+  cd "$ZK_PATH" || exit
+  grep $COMMON_GREP_OPTS -ws --exclude-dir "$EXCLUDE_DIR" "$1" * ;
 }
 
 # Contenido de las notas que contengan la etiqueta pasada como parámetro
 function notes() {
   # Trabajar en el directorio en el que se encuentran las notas para evitar
   # que 'grep' muestre la ruta de los archivos (notas) en los resultados.
-  cd $ZK_PATH || exit
-  notes="$(grep $COMMON_GREP_OPTS -wsl --exclude-dir $EXCLUDE_DIR "$1" *)"
+  cd "$ZK_PATH" || exit
+  notes="$(grep $COMMON_GREP_OPTS -wsl --exclude-dir "$EXCLUDE_DIR" "$1" *)"
   if [[ -n $notes ]];  then
     $NOTES_VIEWER $notes
   else
@@ -125,7 +124,7 @@ function checkNumParam() {
   numParams=$1
   numMaxParams=$2
   errorMessage=$3
-  if [ $numParams -lt $numMaxParams ]; then
+  if [ "$numParams" -lt "$numMaxParams" ]; then
     echo -e "$errorMessage"
     exit 1
   fi
@@ -135,7 +134,7 @@ function checkNumParam() {
 # $1: Comando a comprobar
 function checkInstalledCommand() {
   command=$1
-  if ! command -v $command &> /dev/null
+  if ! command -v "$command" &> /dev/null
   then
       echo -e "$command no encontrado"
   fi
@@ -145,22 +144,22 @@ function checkInstalledCommand() {
 function parse_params() {
   while :; do
     case "${1-}" in
-    -h | --help) usage ;;
-    -?*) echo -e "Opción desconocida: $1" ;;
-    tagtable) tagtable ; break ;;
-    taglist)  taglist ; break ;;
-    tagcloud) checkInstalledCommand 'wordcloud_cli' && tagcloud ; break ;;
-    map_tagnotes) map_tagnotes ; break ;;
-    tagnotes) tagnotes ; break ;;
-    tag)
-      checkNumParam $# 2 "Es necesario especificar una etiqueta: zk tag ${RED}'#tag1'" ;
-      tag $2 ;
-      break ;;
-    notes)
-      checkNumParam $# 2 "Es necesario especificar una etiqueta: zk notes ${RED}'#tag1'" ;
-      notes $2 ;
-      break ;;
-    *) echo -e "Comando desconocido: $1" ;;
+      -h | --help) usage ;;
+      -?*) echo -e "Opción desconocida: $1" ; break ;;
+      tagtable) tagtable ; break ;;
+      taglist)  taglist ; break ;;
+      tagcloud) checkInstalledCommand 'wordcloud_cli' && tagcloud ; break ;;
+      map_tagnotes) map_tagnotes ; break ;;
+      tagnotes) tagnotes | column --table -s ':'; break ;;
+      tag)
+        checkNumParam $# 2 "Es necesario especificar una etiqueta: zk tag ${RED}'#tag1'" ;
+        tag "$2" ;
+        break ;;
+      notes)
+        checkNumParam $# 2 "Es necesario especificar una etiqueta: zk notes ${RED}'#tag1'" ;
+        notes "$2" ;
+        break ;;
+      *) echo -e "Comando desconocido: $1" ; break ;;
     esac
     shift
   done

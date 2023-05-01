@@ -7,22 +7,22 @@ date: abril 2022
   \
 
 **Resumen.** \
-_Existe una amplia variedad de aplicaciones software para gestión de conocimiento (Personal Knowledge Management), siendo las más interesantes aquellas que nos permiten interrelacionar ideas, normalmente escritas en forma de notas. Los datos manejados por estas aplicaciones los constituyen las propias notas y sus metadatos. Como usuarios, desearíamos mantener esos datos en un formato exportable y estándar que evite el "vendor lock-in" con la aplicación elegida permitiéndonos mudanzas futuras si así lo deseamos. Las notas en sí mismas no suelen constituir un problema ya que normalmente se almacenan en ficheros en algún lenguaje estándar de marcado ligero como Markdown. El reto lo constituyen los metadatos ya que, a falta de un estándar, cada aplicación usa su propio formato y forma de almacenamiento. Acotamos el problema cuando entendemos que de esos metadatos son los enlaces entre notas lo realmente relevante. La siguiente propuesta explora el uso de #hashtags para el enlace entre notas independientemente de la aplicación utilizada, buscando una solución centrada en los datos e independiente del software._
+_Existe una amplia variedad de aplicaciones software para gestión de conocimiento (Personal Knowledge Management), siendo las más interesantes aquellas que nos permiten interrelacionar ideas, normalmente escritas en forma de notas. Los datos manejados por estas aplicaciones los constituyen las propias notas y sus metadatos. Como usuarios, desearíamos mantener esos datos en un formato exportable y estándar que evite el "vendor lock-in" con la aplicación elegida permitiéndonos mudanzas futuras si así lo deseamos. Las notas en sí mismas no suelen constituir un problema ya que normalmente se almacenan en ficheros en algún lenguaje estándar de marcado ligero como Markdown. El reto lo constituyen los metadatos ya que, a falta de un estándar, cada aplicación usa su propio formato y forma de almacenamiento. Acotamos el problema cuando entendemos que de esos metadatos son los enlaces entre notas lo realmente relevante. La siguiente propuesta explora el uso de #hashtags para enlazar notas, buscando una solución centrada en los datos e independiente de la aplicación utilizada._
 \
 
 ## El Zettelkasten de Luhmann
 
 Quizá el mayor y más influyente análisis sobre las ventajas de enlazar nuestras notas entre sí para generar conocimiento fue el realizado por el sociólogo alemán Niklas Luhmann[^1] a mediados del siglo XX.
 
-El método Zettelkasten[^2] de Luhmann está basado en la interconexión de ideas escritas en notas. Esta red de conocimiento se convierte así en una herramienta para pensar y escribir. Es la _conexión_ entre ideas lo que le aporta esta característica y no la simple _colección_ de notas. El valor reside en la red que forman. Posteriores autores han denominado a esta red _segundo cerebro_ aunque Luhmann prefería referirse a ella como su _compañero de comunicación_.[^3]
+El método Zettelkasten[^2] de Luhmann está basado en la interconexión de ideas individuales escritas en tarjetas. Esta red de conocimiento se convierte así en una herramienta para pensar y escribir. Lo que le aporta esta característica es la _conexión_ entre ideas y no la simple _colección_ de notas. El valor reside en la red que forman. Posteriores autores han denominado a esta red _segundo cerebro_ aunque Luhmann prefería referirse a ella como su _compañero de comunicación_.[^3]
 
-En una implementación clásica de Zettelkasten se usan tarjetas físicas para escribir las notas[^4], dándole un **identificador único** a cada tarjeta. La conexión entre ellas se establece escribiendo en cada una los identificadores de las tarjetas relacionadas.
+En una implementación clásica de Zettelkasten se usan tarjetas físicas para escribir las notas[^4], dándole un **identificador único** a cada idea-tarjeta. La conexión entre ellas se establece escribiendo en cada una los identificadores de las tarjetas relacionadas.
 
 El punto de entrada a las notas lo constituye el **registro**[^5], formado por una colección de etiquetas (_keywords_)[^6] asociadas a notas que se consideran el inicio de un argumento o tema concreto.
 
 En un **Zettelkasten digital** las notas suelen escribirse en un editor de texto plano usando algún lenguaje de marcado ligero como **Markdown**[^7] o similar. Cada nota se almacenará después en un archivo separado.
 
-En esta solución digital, la **conexión entre notas** puede abordarse de diferentes maneras. Lo habitual es usar aplicaciones específicas para gestión de Zettelkasten que se encargan de mantener algún tipo de registro con los enlaces entre notas. Esto une indefectiblemente nuestro Zettelkasten a una aplicación concreta, haciéndolo dependiente de ella (_vendor lock-in_)[^8]. Si en un futuro deseáramos reemplazar esta aplicación sería difícil recuperar los enlaces entre las notas. En función del método usado por la aplicación para codificar las relaciones, el "rescate" de nuestro Zettelkasten para usarlo en otra aplicación diferente puede llegar a ser complicado.
+En esta solución digital, la **conexión entre notas** puede abordarse de diferentes maneras. Lo habitual es usar aplicaciones específicas para gestión de Zettelkasten que se encargan de mantener algún tipo de registro con los enlaces entre notas. Esto une indefectiblemente nuestro Zettelkasten a una aplicación concreta, haciéndolo dependiente de ella (_vendor lock-in_)[^8]. Si en un futuro deseáramos reemplazar esta aplicación sería difícil recuperar los enlaces entre las notas. En función del método usado por la aplicación para codificar las relaciones, el "rescate" de nuestro Zettelkasten para ser usado en otra aplicación diferente puede llegar a ser complicado.
 
 No ocurre lo mismo con el texto de las notas, escrito en un lenguaje de marcado legible usando cualquier otro editor. Almacenarlo en archivos que utilizan un formato estándar nos proporciona esta independencia entre los datos y la aplicación.
 
@@ -41,9 +41,9 @@ No ocurre lo mismo con el texto de las notas, escrito en un lenguaje de marcado 
 
 Las aplicaciones para gestión de notas suelen usar `[[wikilinks]]` para enlazar notas. El concepto de _wikilink_[^9] permite, mediante una sintaxis sencilla, enlazar unidireccionalmente nodos de datos pertenecientes a una misma aplicación. El ejemplo más habitual son los artículos de una wiki.
 
-Para conseguir que el enlace entre nodos sea bidireccional es necesario crear un _backlink_[^10], es decir, un enlace desde el nodo destino al nodo original. La aplicación suele encargarse de crearlos y gestionarlos automáticamente. En la Wikipedia, por ejemplo, los _backlinks_ de una página se muestran al pulsar sobre "Lo que enlaza aquí".
+Para conseguir que el enlace entre nodos sea bidireccional es necesario crear un _backlink_[^10], es decir, un enlace desde el nodo destino al nodo original. La aplicación suele encargarse de crearlos y gestionarlos automáticamente. En la Wikipedia, por ejemplo, los _backlinks_ de una página se muestran en la entrada "Lo que enlaza aquí" del menú lateral.
 
-Los _wikilinks_ no forman parte del estándar Markdown aunque son casi un estándar de facto y se incluyen en muchas de sus extensiones. Aun así, los editores de texto no suelen reconocerlos y solo es posible usarlos para navegar entre notas usando búsqueda de texto global.
+Los _wikilinks_ no forman parte del estándar Markdown aunque son casi un estándar de facto y se incluyen en muchas de sus extensiones. Aun así, los editores de texto no suelen reconocerlos y solo es posible usarlos para navegar entre notas usando búsqueda global de texto, por ejemplo.
 
 Requieren también identificadores únicos para los nodos a enlazar. Normalmente este identificador será el nombre del fichero o nodo que almacena la nota, perdiéndose el enlace si se modifica el nombre. A veces la aplicación se encarga de modificar los enlaces si detecta cambios en el nombre del nodo. En otros casos el identificador se sitúa en alguna parte de la nota con una sintaxis especial tipo clave-valor, independizándolo del nombre del fichero o se almacenan en una base de datos ligera tipo SQLite.
 
@@ -83,7 +83,7 @@ Las etiquetas podrían situarse en cualquier parte del texto, por ejemplo en el 
     tags: #tag1 #tag2 #tag3
     ---
   \
-intercalando entre el texto el `#concepto` que queremos enlazar o en una línea final aislada para enlazar la nota en su totalidad:
+O intercalando entre el texto el `#concepto` que queremos enlazar o en una línea final aislada para enlazar la nota en su totalidad:
 
     #tag1 #tag2 #tag3
   \
@@ -91,20 +91,20 @@ El uso de etiquetas tiene varias **ventajas** frente a otros métodos:
 
 - Evita requerir identificadores únicos para las notas. Una etiqueta constituye un **identificador no necesariamente único** que permite referenciar una nota para ser enlazada.
 - Una etiqueta forma de manera intrínseca una unión **bidireccional** entre los documentos que la contengan.
-- Un enlace establece una relación 1:1 entre dos notas. Esta misma relación se puede conseguir asignando la misma etiqueta a esas dos notas.
-- Una etiqueta también puede establecer un **conjunto** de notas. Esta idea permite crear subconjuntos de temas específicos dentro de conjuntos más generales o visualizar más claramente las intersecciones entre ideas.
+- Un enlace establece una relación 1:1 entre dos notas. Usando hashtags esta misma relación se puede conseguir asignando la misma etiqueta solo a esas dos notas.
+- Una etiqueta también puede establecer un **conjunto** de notas relacionándolas entre sí. Esta idea permite crear subconjuntos de temas específicos dentro de conjuntos más generales o visualizar más claramente las intersecciones entre ideas.
 - Las etiquetas añaden **contenido semántico** a los enlaces y conjuntos que forman al asignarles un nombre.
 - Aunque solemos asociar etiquetas a conjuntos, es posible usarlas para enlazar **razonamientos** tipo A → B → C → D mediante `#tag1 → #tag1,#tag2 → #tag2,#tag3 → #tag3`
-- En general, en cualquier editor o aplicación, para **mostrar un conjunto de notas enlazadas** se pueden usar las herramientas estándar de búsqueda global de texto. Simplemente buscando el nombre de la etiqueta obtendremos el conjunto notas enlazadas por ella. Esto evita codificar extensiones específicas.
+- Las aplicaciones de gestión de notas suelen tener capacidades de gestión de etiquetas. Si no fuera así, en general, en cualquier editor o aplicación, para **mostrar un conjunto de notas enlazadas** se pueden usar las herramientas estándar de búsqueda global de texto. Simplemente buscando el nombre de la etiqueta obtendremos el conjunto notas enlazadas por ella. Esto evita codificar extensiones específicas.
 \
 
 Aunque según este último punto es posible navegar entre notas enlazadas usando un editor de texto común, también es cierto que no es posible saltar entre notas pulsando sobre las etiquetas y que no todos los editores tienen búsqueda global en varios ficheros.
 
 Algunas aplicaciones para Zettelkasten como _Zettel, Obsidian, Roam Research, logseq_, etc. usan también _hashtags_ como convenio para insertar etiquetas por lo que se podrán aprovechar las opciones de búsqueda y navegación que proporcionan. Normalmente también es posible moverse entre notas pulsando sobre las etiquetas.
 
-Crear enlaces mediante etiquetas de esta manera permite gestionar nuestro repositorio de notas con cualquier aplicación a costa de perder la funcionalidad específica que pueda tener para enlazar notas. Se perderán, por ejemplo, las opciones relativas a los gráficos de nodos y vértices para notas enlazadas aunque es posible utilizar alguna herramienta externa que analice los ficheros y genere estos gráficos.
+Crear enlaces mediante etiquetas de esta manera permite gestionar nuestro repositorio de notas con cualquier aplicación a costa de perder la funcionalidad específica que pueda tener para enlazar notas. Se perderán, por ejemplo, las opciones relativas a los gráficos de nodos y vértices para mostrar la red de notas aunque es posible utilizar alguna herramienta externa que analice los ficheros y genere estos gráficos.
 
-En resumen, mantendremos el control de nuestros datos siempre que usemos _hashtags_ como mecanismo para enlazar notas, absteniéndonos de utilizar las soluciones propietarias que nos ofrecen las diferentes aplicaciones.
+En resumen, mantendremos el control sobre nuestros metadatos siempre que usemos _hashtags_ como mecanismo para enlazar notas, absteniéndonos de utilizar las soluciones propietarias que nos ofrecen las diferentes aplicaciones.
 
 [^12]: https://es.wikipedia.org/wiki/Hashtag
 [^13]: https://en.wikipedia.org/wiki/Book_design#Front_matter
@@ -124,7 +124,6 @@ Repensando la función de los _hashtags_ y analizando su conveniencia vemos que 
 
 Para notas con etiquetas establecidas de esta manera no es necesario usar ninguna herramienta específica de gestión. Podría hacerse de forma simple usando **comandos UNIX** comunes desde un terminal.
 
-Para los comandos que impliquen mostrar el contenido de las notas, una herramienta como `Bat`[^14] para el **resaltado de sintaxis** se convierte en una gran ayuda visual para mostrar Markdown, por ejemplo. Si estuviera instalada en el sistema, en los siguientes comandos se sustituiría `cat` por `bat`.
   \
 
 ``` bash
@@ -139,12 +138,15 @@ grep -wrl '#tag1' | xargs cat
 grep -r '#[[:alnum:]]\+\b'
 
 # Tabla con el número de apariciones de cada etiqueta (tabla de frecuencias).
+# MapReduce:              map | sort | reduce  | sort
 grep -sorh '#[[:alnum:]]\+\b' | sort | uniq -c | sort -rn
 
-# Mostrar las notas asociadas a cada etiqueta
+# Mostrar las notas asociadas a cada etiqueta (Map)
 grep -sor '#[[:alnum:]]\+\b' | column -t -s':' -O 2,1 | sort | uniq
 ```
   \
+
+Para los comandos que impliquen mostrar el contenido de las notas, una herramienta como `Bat`[^14] para el **resaltado de sintaxis** se convierte en una gran ayuda visual para mostrar Markdown, por ejemplo. Si estuviera instalada en el sistema, en los comandos anteriores se sustituiría `cat` por `bat`.
 
 La salida de alguno de estos comandos puede servir como entrada para otras aplicaciones. Por ejemplo, si tenemos instalado WordCloud[^15] (`sudo apt install python3-wordcloud`) podemos generar una imagen que muestre una nube de etiquetas:
 
@@ -152,14 +154,14 @@ La salida de alguno de estos comandos puede servir como entrada para otras aplic
 grep -sorh '#[[:alnum:]]\+\b' \
 | wordcloud_cli --imagefile tagcloud.png && eog tagcloud.png
 ```
-\
+\  
 
 Con estos comandos se puede crear un sencillo **lenguaje especifico de dominio (DSL)** con los siguientes comandos:
 
 ```
-tagtable      # Tabla de frecuencias de etiquetas.
-tagcloud      # Nube de etiquetas.
 tagnotes      # Notas asociadas a cada etiqueta.
+tagcloud      # Nube de etiquetas.
+tagtable      # Tabla de frecuencias de etiquetas.
 tag '#tag1'   # Notas en las que aparezca la etiqueta #tag1
 notes '#tag1' # Contenido de las notas que contengan la etiqueta #tag1
 ```
@@ -187,7 +189,12 @@ notes() { grep -wrl "$1" | xargs cat ; }
 ```
   \
 
-Una solución completa consistiría en agrupar estos y otros comandos y opciones en un script específico. En https://github.com/azuledu/zk pueden encontrarse algunos scripts de ejemplo.
+Una solución completa consistiría en agrupar estos y otros comandos y opciones en un script específico. En [https://github.com/azuledu/zk](https://github.com/azuledu/zk) puede encontrarse un script en bash que sigue esta idea.
+
+Otra posible aproximación sería un **navegador de etiquetas** para el terminal, similar a un navegador de archivos, con un comando para listar etiquetas y otro para ver el contenido de las notas.
+
+Esta segunda aproximación se encuentra en los scripts en Python del repositorio anterior.
+
 
 
 [^14]: https://github.com/sharkdp/bat
